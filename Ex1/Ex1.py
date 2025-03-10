@@ -15,9 +15,8 @@ class Stack:
             self.head = Node(data)
         else:
             temp = self.head
-            while temp.next != None:
-                temp = temp.next
-            temp.next = Node(data)
+            self.head = Node(data)
+            self.head.next = temp
 
     def pop(self):
         if self.head is None:
@@ -28,6 +27,8 @@ class Stack:
         return temp.data, temp.result
 
     def peek(self):
+        if self.head == None:
+            return None
         return self.head.data
     
     def calc(self):
@@ -74,6 +75,7 @@ def main():
     data = argv[1].replace(' ', '')
     indexes = []
     stack = Stack()
+    temp_stack = Stack()
     if '(' not in data:
         result = (data, int(data))
     else:
@@ -85,7 +87,12 @@ def main():
                         start_index = i
                         indexes.append(i)
                         break
-                stack.push(data[start_index + 1: end_index])
+                temp_stack.push(data[start_index + 1: end_index])
+        while True:
+            if temp_stack.peek() == None:
+                break
+            else:
+                stack.push(temp_stack.pop()[0])
         stack.calc()
         result = stack.pop()
     print(f'{argv[1]} = {result[1]}')
