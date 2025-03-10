@@ -98,8 +98,5 @@ def main():
     print(f'{argv[1]} = {result[1]}')
 
 
-
-
-
 if __name__ == '__main__':
     main()
