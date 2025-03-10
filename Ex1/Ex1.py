@@ -31,31 +31,33 @@ class Stack:
         return self.head.data
     
     def calc(self):
-        p = self.head
-        while (True):
-            if '(' not in p.data:
-                if p.data[1] == '-' and p.data[3] == '-':
-                    p.result = do_op(p.data[0], float(p.data[1:3]), float(p.data[3:5]))
-                elif p.data[1] == '-':
-                    p.result = do_op(p.data[0], float(p.data[1:3]), float(p.data[3]))
-                elif p.data[2] == '-':
-                    p.result = do_op(p.data[0], float(p.data[1]), float(p.data[2:4]))            
-                else:
-                    p.result = do_op(p.data[0], float(p.data[1]), float(p.data[2]))
+        if self.head.data.isdigit():
+            self.head.result = int(self.head.data)
+        else:
+            while (True):
+                p = self.head
+                if '(' not in p.data:
+                    if p.data[1] == '-' and p.data[3] == '-':
+                        p.result = do_op(p.data[0], int(p.data[1:3]), int(p.data[3:5]))
+                    elif p.data[1] == '-':
+                        p.result = do_op(p.data[0], int(p.data[1:3]), int(p.data[3]))
+                    elif p.data[2] == '-':
+                        p.result = do_op(p.data[0], int(p.data[1]), int(p.data[2:4]))            
+                    else:
+                        p.result = do_op(p.data[0], int(p.data[1]), int(p.data[2]))
+                    if p.next != None:
+                        q = p.next
+                        while (True):
+                            if p.data in q.data:
+                                q.data = q.data.replace('(' + p.data + ')' , str(p.result))
+                            if q.next != None:
+                                q = q.next
+                            else:
+                                break
                 if p.next != None:
-                    q = p.next
-                    while (True):
-                        if p.data in q.data:
-                            q.data = q.data.replace('(' + p.data + ')' , str(p.result))
-                        if q.next != None:
-                            q = q.next
-                        else:
-                            break
-            if p.next != None:
-                p = p.next
-                self.pop()
-            else:
-                break
+                    self.pop()
+                else:
+                    break
             
 def do_op(opp, num1, num2):
     match opp:
@@ -72,17 +74,20 @@ def main():
     data = argv[1].replace(' ', '')
     indexes = []
     stack = Stack()
-    for j, e in enumerate(data):
-        if e == ')':
-            end_index = j
-            for i in range(end_index, -1, -1):
-                if data[i] == '(' and i not in indexes:
-                    start_index = i
-                    indexes.append(i)
-                    break
-            stack.push(data[start_index + 1: end_index])
-    stack.calc()
-    result = stack.pop()
+    if '(' not in data:
+        result = (data, int(data))
+    else:
+        for j, e in enumerate(data):
+            if e == ')':
+                end_index = j
+                for i in range(end_index, -1, -1):
+                    if data[i] == '(' and i not in indexes:
+                        start_index = i
+                        indexes.append(i)
+                        break
+                stack.push(data[start_index + 1: end_index])
+        stack.calc()
+        result = stack.pop()
     print(f'{argv[1]} = {result[1]}')
 
 
