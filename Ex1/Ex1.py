@@ -1,18 +1,9 @@
 from sys import argv
-
-class Operation:
-    def __init__(self, operator, num1, num2):
-        self.operator = operator
-        self.num1 = num1
-        self.num2 = num2
-    
-    def calc(self):
-        return eval(self.num1 + self.operator + self.num2)
         
-
 class Node:
     def __init__(self, operation):
         self.data = operation
+        self.result = 0
         self.next = None
 
 class Stack:
@@ -34,18 +25,53 @@ class Stack:
         temp = self.head
         self.head = self.head.next
         temp.next = None
-        return temp.data
+        return temp.data, temp.result
 
     def peek(self):
         return self.head.data
     
+    def calc(self):
+        p = self.head
+        while (True):
+            if '(' not in p.data:
+                if p.data[1] == '-' and p.data[3] == '-':
+                    p.result = do_op(p.data[0], float(p.data[1:3]), float(p.data[3:5]))
+                elif p.data[1] == '-':
+                    p.result = do_op(p.data[0], float(p.data[1:3]), float(p.data[3]))
+                elif p.data[2] == '-':
+                    p.result = do_op(p.data[0], float(p.data[1]), float(p.data[2:4]))            
+                else:
+                    p.result = do_op(p.data[0], float(p.data[1]), float(p.data[2]))
+                if p.next != None:
+                    q = p.next
+                    while (True):
+                        if p.data in q.data:
+                            q.data = q.data.replace('(' + p.data + ')' , str(p.result))
+                        if q.next != None:
+                            q = q.next
+                        else:
+                            break
+            if p.next != None:
+                p = p.next
+                self.pop()
+            else:
+                break
+            
+def do_op(opp, num1, num2):
+    match opp:
+        case '+':
+            return num1 + num2
+        case '-':
+            return num1 - num2
+        case '*':
+            return num1 * num2
+        case '/':
+            return num1 / num2
 
 def main():
-    stack = Stack()
-    data = argv[1]
+    data = argv[1].replace(' ', '')
     indexes = []
-    result = Stack()
-    '''(- (* 1 3) (/ 6 (+ 1 2)))'''
+    stack = Stack()
     for j, e in enumerate(data):
         if e == ')':
             end_index = j
@@ -54,8 +80,10 @@ def main():
                     start_index = i
                     indexes.append(i)
                     break
-            result.push(data[start_index + 1: end_index])
-    print(result)
+            stack.push(data[start_index + 1: end_index])
+    stack.calc()
+    result = stack.pop()
+    print(f'{argv[1]} = {result[1]}')
 
 
 
